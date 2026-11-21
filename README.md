@@ -15,11 +15,11 @@ HTML'den kare kare, deterministik video üreten bir [Claude Code](https://claude
 
 ## Bu videoyu hiçbir insan kurgulamadı
 
-[`ornek/tanitim/kare-kare-tanitim.mp4`](ornek/tanitim/kare-kare-tanitim.mp4) — 37 saniye, 1080×1920, 1101 kare.
+[`ornek/tanitim/kare-kare-tanitim.mp4`](ornek/tanitim/kare-kare-tanitim.mp4) — 55 saniye, 1080×1920, 1648 kare.
 
 Videodaki ses **ElevenLabs** (eleven_v4, tek parça), gördüğün her kare de **kare-kare**. Senaryodan
 son MP4'e kadar her adım bu repodaki betiklerle yapıldı; videonun bütün kaynağı
-[`ornek/tanitim/`](ornek/tanitim) klasöründe duruyor. Köşedeki `KARE 0840` sayacı süs değil:
+[`ornek/tanitim/`](ornek/tanitim) klasöründe duruyor. Köşedeki `KARE 0840/1648` sayacı süs değil:
 sahne gerçekten kaçıncı karede olduğunu biliyor, çünkü her kare `index.html#<saniye>` açılarak çekiliyor.
 
 ## Neden böyle?
@@ -33,6 +33,18 @@ Ama bir ajan **kod yazmayı** ve **bir resme bakmayı** çok iyi yapar. kare-kar
 | **Sese kilitli** | Her yazı ve geçiş seslendirmedeki kelime zamanlarından gelir (`T.s3[0]`, `W.s5[2][0]`). Metni değiştir, her şey kendiliğinden kayar. |
 | **İncelenebilir** | Ajan tam render'dan önce istediği anın karesine bakar (`keyframes.sh`). Üst üste binen yazıyı izlemeden yakalar. |
 | **Hafif** | Chrome headless shell + ffmpeg + whisper.cpp. Node projesi, Remotion, After Effects yok. |
+
+## Özellikler
+
+- **İlk kare asla boş değil** — ilk sahnenin öğeleri `t<0`'dan girmeye başlar; `check.sh` ilk karenin parlaklığını ölçer.
+- **Kesmeden geçiş** — bir öğe sahneler arasında kaybolmadan taşınıp dönüşür (tanıtımda tek sayfa → kare ızgarası → logo). Kurgu tek parça akar.
+- **Geçiş çeşitliliği** — art arda iki sahne aynı geçişi kullanmaz: kayma, ölçek, silme, yazma, yakınlaşma sırayla.
+- **Okunuş alanı** — ekranda `Claude Code`, seste "Klod Kod"; ekran metni bozulmaz.
+- **Karaoke altyazı** — konuşulan kelime vurgulu, gelecek kelimeler soluk.
+- **Render öncesi anahtar kareler** — taşan veya üst üste binen yazı tam render'dan önce yakalanır.
+- **Paralel ve güvenli render** — 10 tarayıcı aynı anda; tek bir eksik kare bile render'ı durdurur (sessizce kısalan video yok).
+- **Ses kontrolü** — −16 LUFS ±1.5, süre ve ses akışı ölçülür.
+- **Öğrenen tuzaklar** — her yaşanan hata `references/tuzaklar.md`'ye yazılır; bir sonraki video aynı hatayı yapmaz.
 
 ## Nasıl çalışır
 
