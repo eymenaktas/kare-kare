@@ -128,4 +128,4 @@ Tanıtım videosunu baştan üretmek için [`ornek/tanitim/`](ornek/tanitim) iç
 
 ## Lisans
 
-MIT. Tanıtım videosundaki müzik Suno ile üretildi.
+MIT. Tanıtım videosundaki müzik `ornek/tanitim/music.py` ile kodla üretildi (telifsiz).
