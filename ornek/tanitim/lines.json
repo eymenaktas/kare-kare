@@ -1,9 +1,12 @@
 {"s1":["Bu videoyu hiçbir insan kurgulamadı.","curious"],
 "s2":["Tek bir sayfa, kare kare çekildi.","confident"],
 "s3":["Adı Kare Kare: Claude Code için açık kaynak bir video skill'i.","confident","Adı Kare Kare: Klod Kod için açık kaynak bir video skili."],
-"s4":["Önce senaryo yazılır, ses ElevenLabs ile tek parça okunur.","confident","Önce senaryo yazılır, ses Ilevın Labs ile tek parça okunur."],
-"s5":["Whisper her kelimenin zamanını bulur, yazılar sese kilitlenir.","confident"],
-"s6":["Tarayıcı her kareyi tek tek çeker, ffmpeg hepsini birleştirir.","confident","Tarayıcı her kareyi tek tek çeker, ef ef em peg hepsini birleştirir."],
-"s7":["Aynı girdi, her seferinde aynı video.","confident"],
-"s8":["Şu an duyduğun ses de ElevenLabs, gördüğün her kare de Kare Kare.","excited","Şu an duyduğun ses de Ilevın Labs, gördüğün her kare de Kare Kare."],
-"s9":["Claude'a bir tanıtım videosu yap de, gerisini o halletsin.","warm","Klod'a bir tanıtım videosu yap de, gerisini o halletsin."]}
+"s4":["Senaryoda kısaltmaların okunuşu ayrı yazılır, ekrandaki metin bozulmaz.","confident"],
+"s5":["Ses ElevenLabs ile tek parça okunur; istersen ücretsiz Edge TTS de olur.","confident","Ses Ilevın Labs ile tek parça okunur; istersen ücretsiz Ec Ti Ti Es de olur."],
+"s6":["Whisper her kelimenin zamanını bulur; yazılar ve altyazı sese kilitlenir.","confident"],
+"s7":["Ajan, render'dan önce anahtar karelere bakar ve taşan yazıyı izlemeden yakalar.","confident"],
+"s8":["On tarayıcı kareleri paralel çeker; eksik kare varsa durur.","confident"],
+"s9":["Son kontrol: ilk kare dolu mu, ses −16 LUFS mu?","confident","Son kontrol: ilk kare dolu mu, ses eksi on altı LUFS mu?"],
+"s10":["Her hata tuzaklar dosyasına yazılır; bir sonraki video daha iyi olur.","confident"],
+"s11":["Şu an duyduğun ses ElevenLabs, gördüğün her kare Kare Kare.","excited","Şu an duyduğun ses Ilevın Labs, gördüğün her kare Kare Kare."],
+"s12":["Claude'a bir tanıtım videosu yap de; gerisini o halletsin.","warm","Klod'a, bir tanıtım videosu yap de; gerisini o halletsin."]}
