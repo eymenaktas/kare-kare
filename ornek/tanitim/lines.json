@@ -1,0 +1,9 @@
+{"s1":["Bu videoyu hiçbir insan kurgulamadı.","curious"],
+"s2":["Tek bir sayfa, kare kare çekildi.","confident"],
+"s3":["Adı Kare Kare: Claude Code için açık kaynak bir video skill'i.","confident","Adı Kare Kare: Klod Kod için açık kaynak bir video skili."],
+"s4":["Önce senaryo yazılır, ses ElevenLabs ile tek parça okunur.","confident","Önce senaryo yazılır, ses Ilevın Labs ile tek parça okunur."],
+"s5":["Whisper her kelimenin zamanını bulur, yazılar sese kilitlenir.","confident"],
+"s6":["Tarayıcı her kareyi tek tek çeker, ffmpeg hepsini birleştirir.","confident","Tarayıcı her kareyi tek tek çeker, ef ef em peg hepsini birleştirir."],
+"s7":["Aynı girdi, her seferinde aynı video.","confident"],
+"s8":["Şu an duyduğun ses de ElevenLabs, gördüğün her kare de Kare Kare.","excited","Şu an duyduğun ses de Ilevın Labs, gördüğün her kare de Kare Kare."],
+"s9":["Claude'a bir tanıtım videosu yap de, gerisini o halletsin.","warm","Klod'a bir tanıtım videosu yap de, gerisini o halletsin."]}

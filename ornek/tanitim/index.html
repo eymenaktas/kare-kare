@@ -1,0 +1,149 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:J;src:url(jakarta.ttf)}
+:root{--bg:#0c0c0e;--panel:#17171b;--line:#2a2a31;--ink:#f4f1ea;--muted:#8a8794;--acc:#ffb020;--acc2:#ff6a3d;--ok:#3ddc84;--mono:Menlo,ui-monospace,monospace}
+*{margin:0;box-sizing:border-box}
+body{width:1080px;height:1920px;overflow:hidden;background:var(--bg);font-family:J,system-ui,sans-serif;color:var(--ink);position:relative}
+.a{position:absolute}
+.big{position:absolute;left:0;width:100%;text-align:center;font-weight:800;letter-spacing:-3px;line-height:1.05}
+.card{position:absolute;background:var(--panel);border:2px solid var(--line);border-radius:30px;box-shadow:0 30px 80px -30px #000}
+.mono{font-family:var(--mono)}
+#cap{position:absolute;left:60px;right:60px;bottom:210px;text-align:center;font-size:56px;font-weight:800;line-height:1.3}
+#cap span{display:inline-block;margin:0 7px}
+#hud{position:absolute;left:0;right:0;top:0;height:150px}
+</style></head><body><div id="bgl"></div><div id="root"></div><div id="hud"></div><div id="cap"></div>
+<script>
+const T={"s1": [0.56, 3.04], "s2": [3.04, 5.7], "s3": [5.7, 9.82], "s4": [9.82, 14.06], "s5": [14.06, 18.14], "s6": [18.14, 22.66], "s7": [22.66, 25.58], "s8": [25.58, 30.06], "s9": [30.12, 33.06], "end": 36.72}, W={"s1": [[0.56, 0.66, "Bu"], [0.66, 1.33, "videoyu"], [1.33, 1.7, "hiçbir"], [1.7, 2.1, "insan"], [2.1, 3.04, "kurgulamadı."]], "s2": [[3.04, 3.32, "Tek"], [3.32, 3.6, "bir"], [3.6, 4.11, "sayfa,"], [4.11, 4.47, "kare"], [4.47, 4.84, "kare"], [4.84, 5.7, "çekildi."]], "s3": [[5.7, 5.97, "Adı"], [5.97, 6.34, "Kare"], [6.34, 7.02, "Kare:"], [7.02, 7.4, "Claude"], [7.4, 7.61, "Code"], [7.61, 7.91, "için"], [7.91, 8.21, "açık"], [8.21, 8.67, "kaynak"], [8.67, 8.9, "bir"], [8.9, 9.27, "video"], [9.27, 9.82, "skill'i."]], "s4": [[9.82, 10.159, "Önce"], [10.159, 10.753, "senaryo"], [10.753, 11.431, "yazılır,"], [11.431, 11.686, "ses"], [11.686, 12.534, "ElevenLabs"], [12.534, 12.788, "ile"], [12.788, 13.042, "tek"], [13.042, 13.466, "parça"], [13.466, 14.06, "okunur."]], "s5": [[14.06, 14.55, "Whisper"], [14.55, 14.86, "her"], [14.86, 15.39, "kelimenin"], [15.39, 15.95, "zamanını"], [15.95, 16.67, "bulur,"], [16.67, 16.96, "yazılar"], [16.96, 17.21, "sese"], [17.21, 18.14, "kilitlenir."]], "s6": [[18.14, 18.81, "Tarayıcı"], [18.81, 19.061, "her"], [19.061, 19.563, "kareyi"], [19.563, 19.814, "tek"], [19.814, 20.065, "tek"], [20.065, 20.567, "çeker,"], [20.567, 21.07, "ffmpeg"], [21.07, 21.656, "hepsini"], [21.656, 22.66, "birleştirir."]], "s7": [[22.66, 22.99, "Aynı"], [22.99, 23.55, "girdi,"], [23.55, 23.8, "her"], [23.8, 24.53, "seferinde"], [24.53, 24.79, "aynı"], [24.79, 25.58, "video."]], "s8": [[25.58, 25.746, "Şu"], [25.746, 25.912, "an"], [25.912, 26.576, "duyduğun"], [26.576, 26.824, "ses"], [26.824, 26.99, "de"], [26.99, 27.903, "ElevenLabs,"], [27.903, 28.567, "gördüğün"], [28.567, 28.816, "her"], [28.816, 29.147, "kare"], [29.147, 29.313, "de"], [29.313, 29.645, "Kare"], [29.645, 30.06, "Kare."]], "s9": [[30.12, 30.59, "Claude'a"], [30.59, 30.767, "bir"], [30.767, 31.178, "tanıtım"], [31.178, 31.59, "videosu"], [31.59, 31.766, "yap"], [31.766, 31.943, "de,"], [31.943, 32.413, "gerisini"], [32.413, 32.472, "o"], [32.472, 33.06, "halletsin."]]};
+const FPS=30;
+const cl=x=>Math.min(Math.max(x,0),1), C=(a,b,t)=>cl((t-a)/(b-a)), E=x=>1-Math.pow(1-cl(x),3), L=(a,b,p)=>a+(b-a)*p;
+const B=x=>{x=cl(x);const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)};
+const IO=(t,a,b,fi=0.35,fo=0.3)=>E(C(a-fi,a,t))*(1-E(C(b-fo,b,t)));
+const at=(k,i)=>W[k]&&W[k][i]?W[k][i][0]:T[k][0];
+const pad=(n,l)=>String(n).padStart(l,'0');
+const tc=t=>{t=Math.max(t,0);return pad(Math.floor(t/60),2)+':'+pad(Math.floor(t%60),2)+'.'+pad(Math.floor(t*FPS%FPS),2)};
+const check=(p,s=60,c='var(--ok)')=>`<svg width="${s}" height="${s}" viewBox="0 0 56 56"><circle cx="28" cy="28" r="28" fill="${c}" opacity="${cl(p*3)}"/><path d="M16 29l8 8 16-17" fill="none" stroke="#0c0c0e" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${1-E(C(0.3,1,p))}"/></svg>`;
+// küçük "kare": film karesi gibi köşeli kutu
+const fr=(x,y,w,h,o,fill,extra='')=>`<div class="a" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;border-radius:${w*0.08}px;background:${fill};opacity:${o};${extra}"></div>`;
+// deterministik sözde rastgele
+const R=i=>{const s=Math.sin(i*127.1+311.7)*43758.5453;return s-Math.floor(s)};
+
+function render(t){
+ let h='', bg='';
+ // --- arka plan: yavaş kayan film şeridi delikleri (iki kenarda)
+ const sh=(t*90)%120;
+ for(let i=-1;i<17;i++){const y=i*120+sh;
+  bg+=fr(22,y,34,62,0.16,'var(--ink)')+fr(1024,1920-y-62,34,62,0.16,'var(--ink)');}
+ document.getElementById('bgl').innerHTML=bg;
+
+ // --- SAHNE 1: kanca. Kelimeler sesle gelir; arkada büyük REC
+ if(t<T.s2[0]+0.4){const out=E(C(T.s2[0]-0.1,T.s2[0]+0.4,t));
+  const ws=W.s1; const rows=[[0,1],[2,3],[4]];
+  rows.forEach((r,ri)=>{r.forEach((wi,j)=>{const a=wi===0?-0.3:ws[wi][0];const p=B(C(a-0.1,a+0.22,t));
+   const word=ws[wi][2]; const isLast=wi===4;
+   h+=`<div class="big" style="top:${560+ri*180}px;font-size:${isLast?150:140}px;color:${isLast?'var(--acc)':'var(--ink)'};opacity:${cl(p*2)*(1-out)};transform:translateY(${(1-p)*70-out*120}px) scale(${L(0.9,1,p)})">${''}</div>`;});});
+  // satırları kelime kelime aynı satırda göstermek için:
+  h='';
+  rows.forEach((r,ri)=>{let line='';r.forEach(wi=>{const a=wi===0?-0.3:ws[wi][0];const p=B(C(a-0.1,a+0.22,t));const isLast=wi===4;
+    line+=`<span style="display:inline-block;margin:0 16px;opacity:${cl(p*2)};transform:translateY(${(1-p)*70}px);color:${isLast?'var(--acc)':'var(--ink)'}">${ws[wi][2].replace('.','')}</span>`});
+   h+=`<div class="big" style="top:${600+ri*175}px;font-size:${ri===2?150:138}px;opacity:${1-out};transform:translateY(${-out*160}px)">${line}</div>`;});
+  const rp=0.5+0.5*Math.sin(t*6);
+  h+=`<div class="a mono" style="left:0;width:100%;top:1180px;text-align:center;font-size:40px;color:var(--muted);opacity:${(1-out)}">editör yok · zaman çizelgesi yok · fare yok</div>`;
+ }
+
+ // --- SAHNE 2: tek sayfa → kare ızgarası (kesmeden dönüşüm)
+ if(t>=T.s2[0]-0.3&&t<T.s3[0]+0.5){const p=E(C(T.s2[0]-0.3,T.s2[0]+0.3,t)), out=E(C(T.s3[0],T.s3[0]+0.5,t));
+  const split=E(C(at('s2',3)-0.1,at('s2',3)+0.9,t)); // "kare kare" ile ikiye bölünür
+  const cw=L(760,150,split), chh=L(900,266,split);
+  const N=20, cols=5;
+  for(let i=0;i<N;i++){const cx=i%cols, cy=Math.floor(i/cols);
+   const tx=L(160,90+cx*186,split), ty=L(420,470+cy*300,split);
+   const d=split>0?E(C(at('s2',3)+i*0.03,at('s2',3)+i*0.03+0.6,t)):0;
+   const op=(i===0?1:d)*p*(1-out);
+   const hue=i===0?'var(--panel)':`hsl(${36+R(i)*20} ${60+R(i+3)*30}% ${14+R(i+9)*10}%)`;
+   h+=`<div class="card" style="left:${i===0?tx:L(160,tx,d)}px;top:${i===0?ty:L(420,ty,d)}px;width:${cw}px;height:${chh}px;opacity:${op};background:${hue};overflow:hidden;transform:scale(${L(0.94,1,p)})">`+
+    (i===0&&split<0.5?`<div class="mono" style="padding:44px;font-size:36px;line-height:1.6;color:var(--muted);opacity:${1-split*2}"><span style="color:var(--acc)">function</span> render(<span style="color:var(--ink)">t</span>){<br>&nbsp;&nbsp;<span style="color:#6aa9ff">// her şey t'ye bağlı</span><br>&nbsp;&nbsp;baslik.y = E(C(1,2,t))<br>&nbsp;&nbsp;logo.olcek = B(...)<br>}<br><br><span style="color:var(--ink)">index.html#</span><span style="color:var(--acc)">${t.toFixed(2)}</span></div>`:'')+
+    (i>0||split>=0.5?`<div class="mono" style="position:absolute;left:14px;bottom:10px;font-size:22px;color:var(--ink);opacity:0.7">#${pad(i*28,4)}</div><div style="position:absolute;left:24%;top:30%;width:52%;height:12px;border-radius:6px;background:var(--acc);opacity:.8;transform:translateX(${(R(i)*2-1)*30}px)"></div><div style="position:absolute;left:30%;top:46%;width:40%;height:8px;border-radius:4px;background:var(--ink);opacity:.35"></div>`:'')+`</div>`;
+  }
+  h+=`<div class="big" style="top:200px;font-size:96px;opacity:${p*(1-out)}">${split<0.5?'tek bir <span style="color:var(--acc)">sayfa</span>':'kare <span style="color:var(--acc)">kare</span>'}</div>`;
+ }
+
+ // --- SAHNE 3: logo + rozetler (yakınlaşarak gelir)
+ if(t>=T.s3[0]-0.1&&t<T.s4[0]+0.5){const p=E(C(T.s3[0],T.s3[0]+0.7,t)), out=E(C(T.s4[0],T.s4[0]+0.5,t));
+  const lg=t>=T.s3[0]?1:0;
+  // logo: üst üste kaymış üç kare
+  for(let i=2;i>=0;i--){const q=B(C(T.s3[0]+i*0.1,T.s3[0]+0.5+i*0.1,t));
+   h+=fr(360+i*70-out*200,470+i*-40,220,220,lg*q*(1-out)*(i===0?1:0.5-i*0.12),i===0?'var(--acc)':'var(--ink)',`transform:scale(${L(0.6,1,q)})`);}
+  h+=`<div class="big" style="top:820px;font-size:180px;letter-spacing:-8px;opacity:${p*(1-out)};transform:scale(${L(1.35,1,p)}) translateX(${out*-300}px)">kare<span style="color:var(--acc)">-</span>kare</div>`;
+  const chips=[['Claude Code skill',at('s3',4)],['açık kaynak',at('s3',7)],['MIT',at('s3',9)]];
+  chips.forEach(([c,a],i)=>{const q=B(C(a-0.1,a+0.3,t));
+   h+=`<div class="a mono" style="left:0;width:100%;top:${1080+i*96}px;text-align:center;opacity:${cl(q*2)*(1-out)};transform:translateY(${(1-q)*40}px)"><span style="display:inline-block;border:2px solid var(--line);background:var(--panel);border-radius:999px;padding:14px 34px;font-size:40px;color:${i==0?'var(--acc)':'var(--ink)'}">${c}</span></div>`;});
+ }
+
+ // --- SAHNE 4: senaryo kartı → ses dalgası (soldan kayarak)
+ if(t>=T.s4[0]-0.4&&t<T.s5[0]+0.4){const p=E(C(T.s4[0]-0.4,T.s4[0]+0.2,t)), out=E(C(T.s5[0]-0.1,T.s5[0]+0.4,t));
+  const sx=(1-p)*500;
+  h+=`<div class="card mono" style="left:${110+sx}px;top:360px;width:860px;padding:36px 40px;font-size:31px;line-height:1.6;opacity:${p*(1-out)}"><div style="color:var(--muted);font-size:26px;margin-bottom:10px">lines.json</div>{<br>&nbsp;"s1": [<span style="color:var(--acc)">"Bu videoyu hiçbir..."</span>, "curious"],<br>&nbsp;"s3": [<span style="color:var(--acc)">"Adı Kare Kare..."</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"confident", <span style="color:#6aa9ff">"Klod Kod..."</span>]<br>}</div>`;
+  const wv=E(C(at('s4',4)-0.2,at('s4',4)+0.5,t));
+  let bars='';for(let i=0;i<44;i++){const hh=20+Math.abs(Math.sin(i*0.7+t*5)*Math.sin(i*0.23))*190*wv;bars+=`<div style="width:12px;height:${hh}px;border-radius:6px;background:${i/44<C(at('s4',4),T.s5[0],t)?'var(--acc)':'#3a3a44'}"></div>`;}
+  h+=`<div class="a" style="left:110px;width:860px;top:870px;height:260px;display:flex;align-items:center;justify-content:space-between;opacity:${wv*(1-out)}">${bars}</div>`;
+  h+=`<div class="a" style="left:0;width:100%;top:1180px;text-align:center;font-size:62px;font-weight:800;opacity:${wv*(1-out)};transform:translateY(${(1-wv)*40}px)">ElevenLabs <span style="color:var(--muted);font-weight:600">· tek parça</span></div>`;
+ }
+
+ // --- SAHNE 5: kelime zaman damgaları (dikey kayan liste)
+ if(t>=T.s5[0]-0.2&&t<T.s6[0]+0.4){const p=E(C(T.s5[0]-0.2,T.s5[0]+0.3,t)), out=E(C(T.s6[0],T.s6[0]+0.4,t));
+  const ws=W.s5; let cur=0; ws.forEach((w,i)=>{if(t>=w[0]-0.05)cur=i});
+  h+=`<div class="big" style="top:250px;font-size:84px;opacity:${p*(1-out)}">her kelimenin <span style="color:var(--acc)">zamanı</span></div>`;
+  ws.forEach(([a,b,w],i)=>{const y=820+(i-cur)*120-(C(a-0.05,a+0.15,t))*0; const vis=t>=a-0.05;
+   const on=i===cur;
+   h+=`<div class="a mono" style="left:150px;width:780px;top:${y}px;height:100px;display:flex;align-items:center;justify-content:space-between;padding:0 36px;border-radius:22px;background:${on?'var(--acc)':'var(--panel)'};color:${on?'#0c0c0e':'var(--ink)'};font-size:44px;opacity:${(vis?1:0.25)*p*(1-out)*cl(1-Math.abs(i-cur)*0.28)};transition:none"><span style="font-family:J;font-weight:800">${w.replace(/[.,]/g,'')}</span><span>${a.toFixed(2)} → ${b.toFixed(2)}</span></div>`;});
+ }
+
+ // --- SAHNE 6: kare çekimi ızgarası → ffmpeg → mp4
+ if(t>=T.s6[0]-0.3&&t<T.s7[0]+0.4){const p=E(C(T.s6[0]-0.3,T.s6[0]+0.2,t)), out=E(C(T.s7[0],T.s7[0]+0.4,t));
+  const fill=C(T.s6[0],at('s6',6),t); const cols=10, N=80;
+  for(let i=0;i<N;i++){const on=i/N<fill;const x=110+(i%cols)*88,y=340+Math.floor(i/cols)*88;
+   h+=fr(x,y,76,76,(on?1:0.18)*p*(1-out),on?`hsl(${30+R(i)*20} 90% ${45+R(i+1)*15}%)`:'#3a3a44',`transform:scale(${on?L(0.5,1,E(C(T.s6[0]+i/N*(at('s6',6)-T.s6[0]),T.s6[0]+i/N*(at('s6',6)-T.s6[0])+0.25,t))):1})`);}
+  h+=`<div class="a mono" style="left:110px;top:1080px;font-size:40px;color:var(--muted);opacity:${p*(1-out)}">chrome-headless-shell · <span style="color:var(--acc)">${pad(Math.round(fill*1101),4)}</span>/1101 kare</div>`;
+  const mg=B(C(at('s6',6)-0.1,at('s6',6)+0.45,t));
+  h+=`<div class="a" style="left:0;width:100%;top:1210px;display:flex;justify-content:center;align-items:center;gap:36px;opacity:${cl(mg*2)*(1-out)};transform:scale(${L(0.85,1,mg)})"><span class="mono" style="font-size:48px;padding:20px 34px;border:2px solid var(--line);border-radius:20px;background:var(--panel)">ffmpeg</span><svg width="90" height="40" viewBox="0 0 90 40"><path d="M4 20h74M62 6l16 14-16 14" stroke="var(--acc)" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${1-E(C(at('s6',6),at('s6',6)+0.5,t))}"/></svg><span style="font-size:56px;font-weight:800;padding:20px 38px;border-radius:20px;background:var(--acc);color:#0c0c0e">video.mp4</span></div>`;
+ }
+
+ // --- SAHNE 7: aynı girdi = aynı video (iki özet, tikler)
+ if(t>=T.s7[0]-0.2&&t<T.s8[0]+0.4){const p=E(C(T.s7[0]-0.2,T.s7[0]+0.3,t)), out=E(C(T.s8[0],T.s8[0]+0.4,t));
+  h+=`<div class="big" style="top:330px;font-size:110px;opacity:${p*(1-out)};transform:scale(${L(0.9,1,p)})">aynı girdi<br><span style="color:var(--acc)">aynı video</span></div>`;
+  ['1. render','2. render'].forEach((n,i)=>{const a=at('s7',i===0?2:5);const q=B(C(a-0.1,a+0.35,t));
+   h+=`<div class="card mono" style="left:110px;top:${780+i*190}px;width:860px;height:150px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;font-size:38px;opacity:${cl(q*2)*(1-out)};transform:translateX(${(1-q)*(i?300:-300)}px)"><span style="color:var(--muted)">${n}</span><span>sha256 <span style="color:var(--acc)">9f3a…c41e</span></span>${check(C(T.s7[1]-0.6,T.s7[1],t),64)}</div>`;});
+ }
+
+ // --- SAHNE 8: meta an — dev kare sayacı ve iki etiket
+ if(t>=T.s8[0]-0.2&&t<T.s9[0]+0.4){const p=E(C(T.s8[0]-0.2,T.s8[0]+0.35,t)), out=E(C(T.s9[0],T.s9[0]+0.4,t));
+  h+=`<div class="a mono" style="left:0;width:100%;top:420px;text-align:center;font-size:250px;font-weight:700;letter-spacing:-10px;color:var(--acc);opacity:${p*(1-out)};transform:scale(${L(1.25,1,p)})">${pad(Math.floor(t*FPS),4)}</div>`;
+  h+=`<div class="a mono" style="left:0;width:100%;top:720px;text-align:center;font-size:38px;color:var(--muted);opacity:${p*(1-out)}">şu an izlediğin kare</div>`;
+  [['ses','ElevenLabs',at('s8',4)],['kareler','kare-kare',at('s8',9)]].forEach(([k,v,a],i)=>{const q=B(C(a-0.1,a+0.35,t));
+   h+=`<div class="card" style="left:${110+i*440}px;top:880px;width:420px;height:230px;padding:38px;opacity:${cl(q*2)*(1-out)};transform:translateY(${(1-q)*80}px)"><div class="mono" style="font-size:30px;color:var(--muted)">${k}</div><div style="font-size:62px;font-weight:800;margin-top:24px;color:${i?'var(--acc)':'var(--ink)'}">${v}</div></div>`;});
+ }
+
+ // --- SAHNE 9: terminal istemi + repo
+ if(t>=T.s9[0]-0.3){const p=E(C(T.s9[0]-0.3,T.s9[0]+0.3,t));
+  const msg='bir tanıtım videosu yap'; const ty=Math.floor(msg.length*C(at('s9',1),at('s9',5),t));
+  const cur=(Math.floor(t*2)%2)?'▍':'&nbsp;';
+  h+=`<div class="card mono" style="left:110px;top:520px;width:860px;padding:34px 40px;font-size:42px;opacity:${p};transform:translateY(${(1-p)*80}px)"><div style="display:flex;gap:12px;margin-bottom:26px">${['#ff5f57','#febc2e','#28c840'].map(c=>`<div style="width:22px;height:22px;border-radius:11px;background:${c}"></div>`).join('')}</div><span style="color:var(--acc)">&gt;</span> ${msg.slice(0,ty)}<span style="color:var(--acc)">${cur}</span></div>`;
+  const q=E(C(T.s9[1]-0.2,T.s9[1]+0.8,t));
+  for(let i=2;i>=0;i--)h+=fr(470+i*30,900-i*20,100,100,q*(i===0?1:0.45-i*0.1),i===0?'var(--acc)':'var(--ink)');
+  h+=`<div class="big" style="top:1060px;font-size:150px;letter-spacing:-6px;opacity:${q};transform:scale(${L(1.2,1,q)})">kare<span style="color:var(--acc)">-</span>kare</div>`;
+  h+=`<div class="a mono" style="left:0;width:100%;top:1260px;text-align:center;font-size:42px;color:var(--muted);opacity:${q}">github.com/eymenaktas/<span style="color:var(--ink)">kare-kare</span></div>`;
+ }
+ document.getElementById('root').innerHTML=h;
+
+ // --- HUD: kayıt noktası + gerçek zaman kodu (video kendi karesini sayar)
+ const blink=(Math.floor(t*2)%2)===0;
+ document.getElementById('hud').innerHTML=`<div class="a mono" style="left:90px;top:70px;font-size:30px;color:var(--muted);display:flex;align-items:center;gap:14px"><span style="width:18px;height:18px;border-radius:9px;background:var(--acc2);opacity:${blink?1:0.25}"></span>REC ${tc(t)}</div><div class="a mono" style="right:90px;top:70px;font-size:30px;color:var(--muted)">KARE ${pad(Math.floor(Math.max(t,0)*FPS),4)}</div>`;
+
+ // --- karaoke altyazı (büyük yazının olduğu sahnelerde kapalı)
+ let cap='';
+ for(const s of Object.keys(W)){const ws=W[s]; if(!ws||!ws.length||s==='s1'||s==='s9')continue;
+  if(t<ws[0][0]-0.1||t>ws[ws.length-1][1]+0.3)continue;
+  cap=ws.map(([x,y,w])=>`<span style="opacity:${t>=x?1:0.3};color:${t>=x&&t<y+0.05?'var(--acc)':'var(--ink)'}">${w}</span>`).join('');}
+ document.getElementById('cap').innerHTML=cap;
+}
+render(parseFloat(location.hash.slice(1)||'0'));
+</script></body></html>
