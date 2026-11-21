@@ -22,3 +22,5 @@
 - **words.py son satırları ezebilir**: whisper kapanış cümlesini az token'la verirse son satır 1 sn'ye sıkışır. `silencedetect=n=-35dB:d=0.18` ile duraklamaları bul, son satırların sınırını oradan koy, kelimeleri harf oranıyla dağıt.
 - **Sahne pencereleri üst üste binmesin**: çıkışı bir sonraki sahnenin ilk kelimesinden *önce* bitir (`nx(k)-0.4 → nx(k)-0.05`). Aksi hâlde bir sahnenin başlığı ile sonrakinin dev yazısı aynı karede görünür.
 - **Mix videodan kısa kalmasın**: `apad` + `amix=duration=longest` + `atrim=0:END`; render öncesi `ffprobe` ile mix süresi = `T.end` olmalı.
+- **Harf oranıyla bölme kaydırır**: eski words.py token sayısı tutmayınca satırı harf oranıyla bölüyordu; satır sınırları 2+ sn kaydı. Şimdiki yöntem: `-ojf` (+DTW) token zamanları karakterlere yayılır, okunuş metni SequenceMatcher ile hizalanır, satır başı ±0.3 sn içindeki duraklama bitişine oturtulur. Doğrulama: satır başlarını `silencedetect` bitişleriyle karşılaştır.
+- **Arka plan müziği konuşmanın ~14 dB altında olmalı**: −7 dB'de "fazla heyecanlı" bulundu. `ebur128` ile ikisini ayrı ölç.
