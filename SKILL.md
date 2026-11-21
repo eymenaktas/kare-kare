@@ -1,9 +1,9 @@
 ---
-name: video-motoru
+name: kare-kare
 description: HTML ile kare kare deterministik video üretimi (reels, short, tanıtım, motion graphics, altyazılı kurgu). Seslendirme → kelime zamanları → sahne HTML'i → headless Chrome kareleri → ffmpeg. Claude ile herhangi bir video, reels, short, tanıtım filmi, kinetik yazı, altyazı veya ffmpeg/HyperFrames/Remotion işi yapılırken HER ZAMAN kullan; kullanıcı her seferinde söylemez.
 ---
 
-# Video motoru
+# kare-kare
 
 Video = `render(t)` fonksiyonu olan tek bir HTML sayfası. Her kare, sayfa
 `index.html#<saniye>` ile açılıp ekran görüntüsü alınarak üretilir; sonra
